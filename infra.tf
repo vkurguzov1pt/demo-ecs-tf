@@ -30,7 +30,6 @@ resource "aws_internet_gateway" "ecs_igw" {
 ######################################
 data "aws_availability_zones" "available" {}
 
-
 ######################################
 # Subnets
 ######################################
