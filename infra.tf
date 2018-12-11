@@ -67,7 +67,7 @@ resource "aws_route_table" "ecs_public_rt" {
 resource "aws_route_table_association" "ecs_route_to_subnet_asscn" {
   count           = "${length(var.cidr_blocks)}"
 
-  subnet_id       = "${element(aws_subnet.public.*.id, count.index)}"
+  subnet_id       = "${element(aws_subnet.ecs_public_sn.*.id, count.index)}"
   route_table_id  = "${aws_route_table.ecs_public_rt.id}"
 }
 
