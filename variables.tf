@@ -3,11 +3,6 @@ variable "vpc_cidr_block" {
 	default     = "10.0.0.0/16"
 }
 
-variable "demo" {
-  description = "Show how diff in git works"
-  default     = ""
-}
-
 variable "cidr_blocks" {
 	type = "list"
 	description = "CIDR blocks for Subnets"
