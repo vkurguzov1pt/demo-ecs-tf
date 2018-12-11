@@ -34,23 +34,13 @@ data "aws_availability_zones" "available" {}
 # Subnets
 ######################################
 
-resource "aws_subnet" "ecs_public_subnet_one" {
+resource "aws_subnet" "ecs_public_sn" {
   count             = "${length(var.cidr_blocks)}"
   vpc_id            = "${aws_vpc.ecs_vpc.id}"
   cidr_block        = "${var.cidr_blocks[count.index]}"
   availability_zone = "${data.aws_availability_zones.available.names[count.index]}"
   tags        = {
-    Name      = "demo_ecs_pub_subnet_one"
-  }
-}
-
-resource "aws_subnet" "ecs_public_subnet_two" {
-  count             = "${length(var.cidr_blocks)}"
-  vpc_id            = "${aws_vpc.ecs_vpc.id}"
-  cidr_block        = "${var.cidr_blocks[count.index]}"
-  availability_zone = "${data.aws_availability_zones.available.names[count.index]}"
-  tags        = {
-    Name      = "demo_ecs_pub_subnet_two"
+    Name      = "${format("ecs-public-subnet-%03d", count.index+1)}"
   }
 }
 
@@ -59,14 +49,14 @@ resource "aws_subnet" "ecs_public_subnet_two" {
 # Routing Table for public Subnet
 #######################################
 
-resource "aws_route_table" "ecs_publicsubnet_route_table" {
+resource "aws_route_table" "ecs_public_rt" {
   vpc_id        = "${aws_vpc.ecs_vpc.id}"
   route         = {
     cidr_block  = "0.0.0.0/0"
     gateway_id  = "${aws_internet_gateway.ecs_igw.id}"
   }
   tags          = {
-    Name        = "demo_ecs_public_route_table" 
+    Name        = "demo_ecs_public_rt" 
   }
 }
 
@@ -75,8 +65,10 @@ resource "aws_route_table" "ecs_publicsubnet_route_table" {
 #############################################
 
 resource "aws_route_table_association" "ecs_route_to_subnet_asscn" {
-  subnet_id       = "${aws_subnet.ecs_public_subnet.id}"
-  route_table_id  = "${aws_route_table.ecs_publicsubnet_route_table.id}"
+  count           = "${length(var.cidr_blocks)}"
+
+  subnet_id       = "${element(aws_subnet.public.*.id, count.index)}"
+  route_table_id  = "${aws_route_table.ecs_public_rt.id}"
 }
 
 #################################################################
